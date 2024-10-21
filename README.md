@@ -23,35 +23,45 @@ pip install easytz
 ```bash
 from datetime import datetime
 import pytz
-from easytz import convert_time
+from easytz.convert import convert_time
 
-dt = datetime(2024, 10, 25, 12, 0)  # Naive datetime
+# Create a timezone-aware datetime object
 from_tz = 'America/New_York'
-to_tz = 'Europe/London'
+dt = datetime(2024, 10, 25, 12, 0, 0, tzinfo=pytz.timezone(from_tz))
 
-converted_time = convert_time(dt, from_tz, to_tz)
+# Convert to another time zone (only provide the target timezone)
+to_tz = 'Europe/London'
+converted_time = convert_time(dt, to_tz=to_tz)  # No need to pass from_tz
+
+# Print the result
 print(converted_time)  # Output: 2024-10-25 17:00:00+01:00
 
 ```
 **2. Batch convert a single datetime to multiple time zones**
 
 ```bash
-from easytz import batch_convert_to_multiple_timezones
+from easytz.convert import batch_convert_to_multiple_timezones
+from datetime import datetime
+import pytz
 
-# Create a timezone-aware datetime object
-dt = datetime(2024, 10, 25, 15, 0, 0, tzinfo=pytz.UTC)
+# Event time in UTC
+event_time = datetime(2024, 10, 25, 15, 0, 0, tzinfo=pytz.UTC)
 
-# List of target time zones to convert the datetime to
-target_timezones = ['Europe/London', 'Asia/Tokyo', 'America/New_York']
+# List of time zones to convert to
+target_timezones = ['America/New_York', 'Europe/London', 'Asia/Tokyo', 'Australia/Sydney']
 
-converted_times = batch_convert_to_multiple_timezones(dt, target_timezones)
-print(converted_times)
+# Convert the event time to all these time zones
+converted_times = batch_convert_to_multiple_timezones(event_time, target_timezones)
+
+# Print the results
+for time_data in converted_times:
+    print(f"Event time in {time_data['to_tz']}: {time_data['converted_time']}")
 
 ```
 **3. Batch convert a list of datetimes to a target time zone**
 
 ```bash
-from easytz import batch_convert_times
+from easytz.convert import batch_convert_times
 
 # List of datetime objects from different time zones
 times_list = [
@@ -69,7 +79,7 @@ print(converted_times)
 **4. Localize a naive datetime to the system's local time zones**
 
 ```bash
-from easytz import localize_to_system_timezone
+from easytz.convert import localize_to_system_timezone
 
 dt = datetime(2024, 10, 25, 12, 0)  # Naive datetime
 localized_dt = localize_to_system_timezone(dt)

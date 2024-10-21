@@ -1,13 +1,12 @@
 from datetime import datetime
 import pytz
 
-def convert_time(dt, from_tz, to_tz):
+def convert_time(dt, to_tz):
     """
-    Convert a datetime object from one time zone to another.
+    Convert a datetime object from its timezone to another time zone.
 
     Args:
-    - dt (datetime): The datetime object to convert.
-    - from_tz (str): The source time zone (e.g., 'America/New_York').
+    - dt (datetime): The timezone-aware datetime object to convert.
     - to_tz (str): The target time zone (e.g., 'Europe/London').
 
     Returns:
@@ -16,11 +15,12 @@ def convert_time(dt, from_tz, to_tz):
     if dt.tzinfo is None:
         raise ValueError("The input datetime must be timezone-aware.")
 
-    from_timezone = pytz.timezone(from_tz)
+    # Directly use the current tzinfo of dt
+    from_timezone = dt.tzinfo
     to_timezone = pytz.timezone(to_tz)
 
-    dt_from = dt.astimezone(from_timezone)
-    dt_to = dt_from.astimezone(to_timezone)
+    # Convert the datetime to the target timezone
+    dt_to = dt.astimezone(to_timezone)
 
     return dt_to
 
@@ -29,7 +29,7 @@ def batch_convert_to_multiple_timezones(dt, target_timezones):
     Convert a single datetime object to a list of time zones.
 
     Args:
-    - dt (datetime): The datetime object to convert.
+    - dt (datetime): The timezone-aware datetime object to convert.
     - target_timezones (list of str): A list of time zones to convert to.
 
     Returns:
@@ -41,7 +41,10 @@ def batch_convert_to_multiple_timezones(dt, target_timezones):
     converted_times = []
 
     for tz in target_timezones:
-        converted_time = convert_time(dt, dt.tzinfo.zone, tz)
+        # Convert the datetime to the target time zone
+        converted_time = convert_time(dt, tz)  # We no longer pass the from_tz (since it's already timezone-aware)
+
+        # Append the conversion result
         converted_times.append({
             'original_time': dt.strftime('%Y-%m-%d %H:%M:%S'),
             'from_tz': dt.tzinfo.zone,
@@ -51,8 +54,6 @@ def batch_convert_to_multiple_timezones(dt, target_timezones):
 
     return converted_times
 
-from datetime import datetime
-import pytz
 
 def batch_convert_times(times_list, to_tz):
     """

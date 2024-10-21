@@ -17,7 +17,7 @@ class TestConvertFunctions(unittest.TestCase):
 
     def test_convert_time(self):
         # Test converting from UTC to New York timezone
-        dt_converted = convert_time(self.dt_aware_utc, 'UTC', 'America/New_York')
+        dt_converted = convert_time(self.dt_aware_utc,  'America/New_York')
 
         # Check the time zone of the result
         self.assertEqual(dt_converted.tzinfo.zone, 'America/New_York')
@@ -92,7 +92,7 @@ class TestConvertFunctions(unittest.TestCase):
     def test_convert_time_with_naive_datetime(self):
         # Test that convert_time raises ValueError if input datetime is naive
         with self.assertRaises(ValueError):
-            convert_time(self.dt_naive, 'UTC', 'America/New_York')
+            convert_time(self.dt_naive, 'America/New_York')
 
     def test_batch_convert_times_with_naive_datetime(self):
         # Test that batch_convert_times correctly handles naive datetimes by localizing them
